@@ -7,23 +7,33 @@ import sys
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) < 2:
         sys.exit(1)
 
-    employee_id = sys.argv[1]
+    try:
+        employee_id = int(sys.argv[1])
+    except ValueError:
+        sys.exit(1)
+
     base_url = "https://jsonplaceholder.typicode.com"
 
     # Fetch user data
-    user_response = requests.get(f"{base_url}/users/{employee_id}")
+    user_url = "{}/users/{}".format(base_url, employee_id)
+    user_response = requests.get(user_url)
     user_data = user_response.json()
     employee_name = user_data.get("name")
 
     # Fetch todos for the user
-    todos_response = requests.get(f"{base_url}/todos?userId={employee_id}")
+    todos_url = "{}/todos?userId={}".format(base_url, employee_id)
+    todos_response = requests.get(todos_url)
     todos = todos_response.json()
 
     # Calculate completed tasks
-    completed_tasks = [task for task in todos if task.get("completed")]
+    completed_tasks = []
+    for task in todos:
+        if task.get("completed") is True:
+            completed_tasks.append(task)
+
     total_tasks = len(todos)
     num_completed = len(completed_tasks)
 
