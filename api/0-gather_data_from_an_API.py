@@ -11,21 +11,20 @@ def gather_data():
     Fetches and displays the employee's TODO list progress.
     """
     if len(sys.argv) != 2:
+        # Exit with error status if no ID is provided
         sys.exit(1)
 
     try:
-        # 1. Get the employee ID from the command line argument
+        # 1. Get the employee ID
         user_id = sys.argv[1]
         base_url = "https://jsonplaceholder.typicode.com"
 
-        # 2. Fetch User Information (to get the employee name)
+        # 2. Fetch User Information
         user_response = requests.get(f"{base_url}/users/{user_id}")
         user_data = user_response.json()
-
-        # Safely extract the employee name using .get()
         employee_name = user_data.get("name")
 
-        # 3. Fetch TODO list for the employee (E128 Fix applied here)
+        # 3. Fetch TODO list (PEP8 E128 fix applied)
         todo_response = requests.get(
             f"{base_url}/todos",
             params={"userId": user_id}
@@ -38,19 +37,20 @@ def gather_data():
                       for task in todo_list if task.get("completed") is True]
         number_of_done_tasks = len(done_tasks)
 
-        # 5. Display the progress (Corrected formatting for main_0.py, main_2.py)
+        # 5. Display the progress (STRICT FORMATTING FIX)
+        # This line ensures the exact required string is produced:
+        # "Employee NAME is done with tasks(DONE/TOTAL):"
         print("Employee {} is done with tasks({}/{}):".format(
             employee_name, number_of_done_tasks, total_tasks
         ))
 
-        # 6. Display the completed task titles with the required indentation
-        # (Fixes main_3.py and main_4.py with strict "\t ")
+        # 6. Display completed task titles (STRICT INDENTATION FIX)
+        # Ensures exactly one tab (\t) and one space before the title.
         for task_title in done_tasks:
             print("\t {}".format(task_title))
 
-    except requests.exceptions.RequestException:
-        sys.exit(1)
     except Exception:
+        # Catch any error (e.g., API connection, bad ID) and exit
         sys.exit(1)
 
 
