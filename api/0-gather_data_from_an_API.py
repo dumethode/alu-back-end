@@ -1,58 +1,35 @@
 #!/usr/bin/python3
-"""
-Gather data from an API and display an employee's TODO list progress.
-"""
+"""Fetch and display user TODO progress"""
+
 import requests
 import sys
 
-
-def gather_data():
-    """
-    Fetches and displays the employee's TODO list progress.
-    """
-    if len(sys.argv) != 2:
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: ./script.py <user_id>")
         sys.exit(1)
 
-    try:
-        # 1. Get the employee ID
-        user_id = sys.argv[1]
-        base_url = "https://jsonplaceholder.typicode.com"
+    user_id = sys.argv[1]
+    user_url = f"https://jsonplaceholder.typicode.com/users/{user_id}"
+    todos_url = f"https://jsonplaceholder.typicode.com/users/{user_id}/todos"
 
-        # 2. Fetch User Information
-        user_response = requests.get(f"{base_url}/users/{user_id}")
-        user_data = user_response.json()
-        
-        # Strip Name Whitespace to fix "Employee Name: Incorrect"
-        employee_name = user_data.get("name").strip()
+    user_res = requests.get(user_url)
+    todos_res = requests.get(todos_url)
 
-        # 3. Fetch TODO list (PEP8 E128 fix)
-        todo_response = requests.get(
-            f"{base_url}/todos",
-            params={"userId": user_id}
-        )
-        todo_list = todo_response.json()
-
-        # 4. Calculate task progress
-        total_tasks = len(todo_list)
-        done_tasks = [task.get("title")
-                      for task in todo_list if task.get("completed") is True]
-        number_of_done_tasks = len(done_tasks)
-
-        # 5. Display the progress (STRICT FORMATTING)
-        # Fixes all output size errors (main_0, main_1, main_2)
-        print("Employee {} is done with tasks({}/{}):".format(
-            employee_name, number_of_done_tasks, total_tasks
-        ))
-
-        # 6. Display completed task titles (STRICT INDENTATION)
-        # Fixes main_3 and main_4 output detection errors.
-        for task_title in done_tasks:
-            print("\t {}".format(task_title.strip()))
-
-    except Exception:
-        # Catch all errors (API connection, bad ID) and exit as required
+    if user_res.status_code != 200:
+        print("Error: user not found")
         sys.exit(1)
 
+    user_info = user_res.json()
+    todos_info = todos_res.json()
 
-if __name__ == "__main__":
-    gather_data()
+    employee_name = user_info.get("name", "Unknown")
+    completed_tasks = [t for t in todos_info if t.get("completed")]
+    total_number_of_tasks = len(todos_info)
+    number_of_done_tasks = len(completed_tasks)
+
+    print("Employee {} is done with tasks({}/{}):".
+          format(employee_name, number_of_done_tasks, total_number_of_tasks))
+
+    for task in completed_tasks:
+        print(f"\t {task['title']}")
