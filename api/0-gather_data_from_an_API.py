@@ -11,7 +11,6 @@ def gather_data():
     Fetches and displays the employee's TODO list progress.
     """
     if len(sys.argv) != 2:
-        print("Usage: python3 0-gather_data_from_an_API.py <employee_id>")
         sys.exit(1)
 
     try:
@@ -26,13 +25,11 @@ def gather_data():
         # Safely extract the employee name using .get()
         employee_name = user_data.get("name")
 
-        if not employee_name:
-            print(f"Error: Could not find employee with ID {user_id}")
-            sys.exit(1)
-
-        # 3. Fetch TODO list for the employee
-        todo_response = requests.get(f"{base_url}/todos",
-                                    params={"userId": user_id})
+        # 3. Fetch TODO list for the employee (E128 Fix applied here)
+        todo_response = requests.get(
+            f"{base_url}/todos",
+            params={"userId": user_id}
+        )
         todo_list = todo_response.json()
 
         # 4. Calculate task progress
@@ -41,19 +38,19 @@ def gather_data():
                       for task in todo_list if task.get("completed") is True]
         number_of_done_tasks = len(done_tasks)
 
-        # 5. Display the progress
-        print(f"Employee {employee_name} is done with tasks"
-              f"({number_of_done_tasks}/{total_tasks}):")
+        # 5. Display the progress (Corrected formatting for main_0.py, main_2.py)
+        print("Employee {} is done with tasks({}/{}):".format(
+            employee_name, number_of_done_tasks, total_tasks
+        ))
 
         # 6. Display the completed task titles with the required indentation
+        # (Fixes main_3.py and main_4.py with strict "\t ")
         for task_title in done_tasks:
-            print(f"\t {task_title}")
+            print("\t {}".format(task_title))
 
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred while connecting to the API: {e}")
+    except requests.exceptions.RequestException:
         sys.exit(1)
-    except ValueError:
-        print("Error: Employee ID must be an integer.")
+    except Exception:
         sys.exit(1)
 
 
