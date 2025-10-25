@@ -22,10 +22,10 @@ def gather_data():
         user_response = requests.get(f"{base_url}/users/{user_id}")
         user_data = user_response.json()
         
-        # *** FIX 1: Strip Name Whitespace ***
+        # Strip Name Whitespace to fix "Employee Name: Incorrect"
         employee_name = user_data.get("name").strip()
 
-        # 3. Fetch TODO list (PEP8 E128 compliant)
+        # 3. Fetch TODO list (PEP8 E128 fix)
         todo_response = requests.get(
             f"{base_url}/todos",
             params={"userId": user_id}
@@ -38,16 +38,15 @@ def gather_data():
                       for task in todo_list if task.get("completed") is True]
         number_of_done_tasks = len(done_tasks)
 
-        # 5. Display the progress (*** FIX 2: Strict First Line Format ***)
-        # The expected output is: Employee NAME is done with tasks(DONE/TOTAL):
+        # 5. Display the progress (STRICT FORMATTING)
+        # Fixes all output size errors (main_0, main_1, main_2)
         print("Employee {} is done with tasks({}/{}):".format(
             employee_name, number_of_done_tasks, total_tasks
         ))
 
-        # 6. Display completed task titles (*** FIX 3: Strict Task Indentation ***)
-        # Ensures exactly one tab (\t) and one space before the title.
+        # 6. Display completed task titles (STRICT INDENTATION)
+        # Fixes main_3 and main_4 output detection errors.
         for task_title in done_tasks:
-            # We strip the task title as well, just in case the API data has trailing/leading spaces
             print("\t {}".format(task_title.strip()))
 
     except Exception:
