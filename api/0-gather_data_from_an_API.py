@@ -7,14 +7,7 @@ import sys
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        sys.exit(1)
-
-    try:
-        employee_id = int(sys.argv[1])
-    except ValueError:
-        sys.exit(1)
-
+    employee_id = sys.argv[1]
     base_url = "https://jsonplaceholder.typicode.com"
 
     # Fetch user data
