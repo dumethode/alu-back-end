@@ -5,7 +5,6 @@ Gather data from an API and display an employee's TODO list progress.
 import requests
 import sys
 
-
 def gather_data():
     """
     Fetches and displays the employee's TODO list progress.
@@ -17,35 +16,37 @@ def gather_data():
     try:
         # 1. Get the employee ID from the command line argument
         user_id = sys.argv[1]
+        
+        # 2. Define the API base URL
         base_url = "https://jsonplaceholder.typicode.com"
-
-        # 2. Fetch User Information (to get the employee name)
+        
+        # 3. Fetch User Information (to get the employee name)
+        # Use .get() as required
         user_response = requests.get(f"{base_url}/users/{user_id}")
         user_data = user_response.json()
-
+        
         # Safely extract the employee name using .get()
         employee_name = user_data.get("name")
-
+        
         if not employee_name:
             print(f"Error: Could not find employee with ID {user_id}")
             sys.exit(1)
 
-        # 3. Fetch TODO list for the employee
-        todo_response = requests.get(f"{base_url}/todos",
-                                    params={"userId": user_id})
+        # 4. Fetch TODO list for the employee
+        todo_response = requests.get(f"{base_url}/todos", params={"userId": user_id})
         todo_list = todo_response.json()
 
-        # 4. Calculate task progress
+        # 5. Calculate task progress
         total_tasks = len(todo_list)
-        done_tasks = [task.get("title")
-                      for task in todo_list if task.get("completed") is True]
+        
+        # Filter completed tasks
+        done_tasks = [task.get("title") for task in todo_list if task.get("completed") is True]
         number_of_done_tasks = len(done_tasks)
 
-        # 5. Display the progress
-        print(f"Employee {employee_name} is done with tasks"
-              f"({number_of_done_tasks}/{total_tasks}):")
-
-        # 6. Display the completed task titles with the required indentation
+        # 6. Display the progress
+        print(f"Employee {employee_name} is done with tasks({number_of_done_tasks}/{total_tasks}):")
+        
+        # 7. Display the completed task titles with the required indentation
         for task_title in done_tasks:
             print(f"\t {task_title}")
 
