@@ -11,7 +11,6 @@ def gather_data():
     Fetches and displays the employee's TODO list progress.
     """
     if len(sys.argv) != 2:
-        # Exit with error status if no ID is provided
         sys.exit(1)
 
     try:
@@ -22,9 +21,11 @@ def gather_data():
         # 2. Fetch User Information
         user_response = requests.get(f"{base_url}/users/{user_id}")
         user_data = user_response.json()
-        employee_name = user_data.get("name")
+        
+        # *** FIX 1: Strip Name Whitespace ***
+        employee_name = user_data.get("name").strip()
 
-        # 3. Fetch TODO list (PEP8 E128 fix applied)
+        # 3. Fetch TODO list (PEP8 E128 compliant)
         todo_response = requests.get(
             f"{base_url}/todos",
             params={"userId": user_id}
@@ -37,20 +38,20 @@ def gather_data():
                       for task in todo_list if task.get("completed") is True]
         number_of_done_tasks = len(done_tasks)
 
-        # 5. Display the progress (STRICT FORMATTING FIX)
-        # This line ensures the exact required string is produced:
-        # "Employee NAME is done with tasks(DONE/TOTAL):"
+        # 5. Display the progress (*** FIX 2: Strict First Line Format ***)
+        # The expected output is: Employee NAME is done with tasks(DONE/TOTAL):
         print("Employee {} is done with tasks({}/{}):".format(
             employee_name, number_of_done_tasks, total_tasks
         ))
 
-        # 6. Display completed task titles (STRICT INDENTATION FIX)
+        # 6. Display completed task titles (*** FIX 3: Strict Task Indentation ***)
         # Ensures exactly one tab (\t) and one space before the title.
         for task_title in done_tasks:
-            print("\t {}".format(task_title))
+            # We strip the task title as well, just in case the API data has trailing/leading spaces
+            print("\t {}".format(task_title.strip()))
 
     except Exception:
-        # Catch any error (e.g., API connection, bad ID) and exit
+        # Catch all errors (API connection, bad ID) and exit as required
         sys.exit(1)
 
 
